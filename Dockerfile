@@ -1,8 +1,15 @@
 # Use Ubuntu base image
 FROM ubuntu:22.04
 
+# Avoid timezone prompt
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y tzdata
+
+# Set timezone to UTC automatically
+RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && dpkg-reconfigure -f noninteractive tzdata
+
 # Install dependencies
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y \
     wget \
     gdebi-core \
     r-base \
