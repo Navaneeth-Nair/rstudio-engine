@@ -5,30 +5,30 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y tzdata
 RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && dpkg-reconfigure -f noninteractive tzdata
 
-# Install base dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     r-base \
     gdebi-core \
-    curl \
+    wget \
     sudo \
     pandoc \
-    gpg \
     libssl-dev \
     libcurl4-openssl-dev \
     libxml2-dev \
-    apt-transport-https \
+    libclang-dev \
+    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
-# Download and install RStudio Server (server build, not desktop)
+# Download and install RStudio Server
 WORKDIR /tmp
-RUN curl -LO https://download1.rstudio.org/server/jammy/amd64/rstudio-server-2025.09.1-401-amd64.deb \
+RUN wget https://download2.rstudio.org/server/jammy/amd64/rstudio-server-2025.09.1-401-amd64.deb \
     && gdebi -n rstudio-server-2025.09.1-401-amd64.deb \
     && rm rstudio-server-2025.09.1-401-amd64.deb
 
-# Create RStudio user
+# Create a default user
 RUN useradd -m rstudio && echo "rstudio:rstudio" | chpasswd && adduser rstudio sudo
 
-# Expose RStudio port
+# Expose RStudio Server port
 EXPOSE 8787
 
 # Start RStudio Server
