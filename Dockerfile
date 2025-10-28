@@ -18,16 +18,16 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Download and install latest RStudio Server
+# Download & install the specific RStudio Server version
 WORKDIR /tmp
-RUN wget https://download2.rstudio.org/server/jammy/amd64/rstudio-server-latest-amd64.deb \
-    && gdebi -n rstudio-server-latest-amd64.deb \
-    && rm rstudio-server-latest-amd64.deb
+RUN wget https://download1.rstudio.org/electron/jammy/amd64/rstudio-2025.09.1-401-amd64.deb \
+    && gdebi -n rstudio-2025.09.1-401-amd64.deb \
+    && rm rstudio-2025.09.1-401-amd64.deb
 
 # Create RStudio user
 RUN useradd -m rstudio && echo "rstudio:rstudio" | chpasswd && adduser rstudio sudo
 
-# Expose RStudio port
+# Expose the port
 EXPOSE 8787
 
 # Start RStudio Server
