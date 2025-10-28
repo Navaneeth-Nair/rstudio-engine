@@ -16,18 +16,19 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libcurl4-openssl-dev \
     libxml2-dev \
+    apt-transport-https \
     && rm -rf /var/lib/apt/lists/*
 
-# Download & install the specific RStudio Server version
+# Download & install RStudio SERVER (not Desktop)
 WORKDIR /tmp
-RUN wget https://download1.rstudio.org/electron/jammy/amd64/rstudio-2025.09.1-401-amd64.deb \
-    && gdebi -n rstudio-2025.09.1-401-amd64.deb \
-    && rm rstudio-2025.09.1-401-amd64.deb
+RUN wget https://download1.rstudio.org/server/jammy/amd64/rstudio-server-2025.09.1-401-amd64.deb \
+    && gdebi -n rstudio-server-2025.09.1-401-amd64.deb \
+    && rm rstudio-server-2025.09.1-401-amd64.deb
 
 # Create RStudio user
 RUN useradd -m rstudio && echo "rstudio:rstudio" | chpasswd && adduser rstudio sudo
 
-# Expose the port
+# Expose port 8787 (RStudio default)
 EXPOSE 8787
 
 # Start RStudio Server
