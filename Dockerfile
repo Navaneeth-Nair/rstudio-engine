@@ -1,35 +1,35 @@
-# Use Ubuntu base image
 FROM ubuntu:22.04
 
-# Avoid timezone prompt
+# Avoid timezone prompts
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y tzdata
 RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && dpkg-reconfigure -f noninteractive tzdata
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    apt-transport-https \
     wget \
-    gdebi-core \
-    r-base \
+    gpg \
     sudo \
+    r-base \
     pandoc \
     libssl-dev \
     libcurl4-openssl-dev \
     libxml2-dev \
-    apt-transport-https \
     && rm -rf /var/lib/apt/lists/*
 
-# Download & install RStudio SERVER (not Desktop)
-WORKDIR /tmp
-RUN wget https://download1.rstudio.org/server/jammy/amd64/rstudio-server-2025.09.1-401-amd64.deb \
-    && gdebi -n rstudio-server-2025.09.1-401-amd64.deb \
-    && rm rstudio-server-2025.09.1-401-amd64.deb
+# Add Posit (RStudio) repo
+RUN wget -qO- https://repos.rstudio.com/rstudio-server/jammy/amd64/Packages | head -n 10 || true
+RUN wget -qO- https://package-manager.rstudio.com/posit.gpg | gpg --dearmor -o /usr/share/keyrings/posit.gpg
+RUN echo "deb [signed-by=/usr/share/keyrings/posit.gpg] https://package-manager.rstudio.com/all/jammy/latest main" > /etc/apt/sources.list.d/posit.list
 
-# Create RStudio user
+# Install RStudio Server from Posit APT repo
+RUN apt-get update && apt-get install -y rstudio-server
+
+# Create user
 RUN useradd -m rstudio && echo "rstudio:rstudio" | chpasswd && adduser rstudio sudo
 
-# Expose port 8787 (RStudio default)
 EXPOSE 8787
 
-# Start RStudio Server
 CMD ["/usr/lib/rstudio-server/bin/rserver", "--server-daemonize=0", "--www-port=8787", "--auth-none=1"]
